@@ -7,7 +7,7 @@ const port = 3333
 
 
 const GPTApi = new ChatGPTAPI({
-  apiKey: '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',
+  apiKey: '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',
 })
 const ws = new WebSocketServer({
   port: 3332
@@ -21,14 +21,19 @@ ws.on('connection', (wss) => {
   let currentGpt
 
   wss.on('message', async (data) => {
-    const options = currentGpt ? {
-      conversationId: currentGpt.conversationId,
-      parentMessageId: currentGpt.id
-    } : {}
+    try {
+      const options = currentGpt ? {
+        conversationId: currentGpt.conversationId,
+        parentMessageId: currentGpt.id
+      } : {}
 
-    const response = await GPTApi.sendMessage(data.toString(), options)
-    currentGpt === response ? null : currentGpt = response
+      const response = await GPTApi.sendMessage(JSON.parse(data.toString()), options)
+      currentGpt === response ? null : currentGpt = response
 
-    wss.send(response.text)
+      wss.send(response.text)
+    } catch (error) {
+      console.warn(error)
+      wss.send('sorry,this bot is wrong,please wait a few')
+    }
   })
 })
