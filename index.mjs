@@ -1,13 +1,29 @@
 import { ChatGPTAPI } from 'chatgpt'
-import exp from 'express'
 import { WebSocketServer } from 'ws'
+import Mysql from 'mysql'
 
-const app = exp()
-const port = 3333
 
+const connection = Mysql.createConnection({
+  host: 'localhost',
+  port: '3306',
+  user: 'root',
+  password: 'password'
+})
+
+connection.connect((err) => {
+  if (err) {
+    console.error(err)
+    throw Error('连接失败')
+  }
+  connection.query("CREATE DATABASE Test", (err, res) => {
+    debugger
+    if (err) throw Error('创建失败')
+    console.log(res)
+  })
+})
 
 const GPTApi = new ChatGPTAPI({
-  apiKey: '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',
+  apiKey: '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',
 })
 const ws = new WebSocketServer({
   port: 3332
